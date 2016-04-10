@@ -36,7 +36,7 @@ class Google extends Service
                 "responses" => $results
         );
         
-        if (empty($results)) {
+		if (empty($results)) {
             $template = "empty.tpl";
         } else {
             $template = "basic.tpl";
