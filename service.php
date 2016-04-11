@@ -1,20 +1,18 @@
 <?php
-use Goutte\Client;
 
 class Google extends Service
 {
-
-    /*
-     * Function executed when the service is called
-     *
-     * @param Request
-     * @return Response
-     */
-    public function _main (Request $request)
-    {
+	/**
+	 * Perform a Google search
+	 *
+	 * @param Request
+	 * @return Response
+	 */
+	public function _main (Request $request)
+	{
 		// include lib
 		require_once $this->pathToService."/lib/CustomSearch.php";
-		
+
 		//Initialize the search class
 		$cs = new Fogg\Google\CustomSearch\CustomSearch();
 
@@ -25,27 +23,27 @@ class Google extends Service
 		if (isset($gresults->items))
 		foreach ($gresults->items as $gresult){
 			$results[] =  array(
-                                "title" => $gresult->htmlTitle,
-                                "url" => $gresult->link,
-                                "note" => $gresult->htmlSnippet
-                        );
+				"title" => $gresult->htmlTitle,
+				"url" => $gresult->link,
+				"note" => $gresult->htmlSnippet
+			);
 		}
-		
+
 		$responseContent = array(
-                "query" => $request->query,
-                "responses" => $results
-        );
-        
+			"query" => $request->query,
+			"responses" => $results
+		);
+
 		if (empty($results)) {
-            $template = "empty.tpl";
-        } else {
-            $template = "basic.tpl";
-        }
-        
-        // create the response
-        $response = new Response();
-        $response->setResponseSubject("Buscando en la web con Google");
-        $response->createFromTemplate($template, $responseContent);
-        return $response;
-    }
+			$template = "empty.tpl";
+		} else {
+			$template = "basic.tpl";
+		}
+
+		// create the response
+		$response = new Response();
+		$response->setResponseSubject("Google: " . $request->query);
+		$response->createFromTemplate($template, $responseContent);
+		return $response;
+	}
 }
