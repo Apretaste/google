@@ -5,7 +5,7 @@
 	<font style="color: #545454;font-size: small;">{$response['note']}</font><br/>
 	<small>
 		{link href="WEB FULL {$response['url']}" caption="Ver con im&aacute;genes"} {separator}
-		{link href="PIZARRA {$response['url']}" caption="Compartir en Pizarra"}
+		{link href="PIZARRA Miren esto: {$response['url']}" caption="Compartir en Pizarra"}
 	</small>
 	{space15}
 {/foreach}
