@@ -20,7 +20,7 @@ class Google extends Service
 		}
 
 		// include lib
-		require_once $this->pathToService."/lib/CustomSearch.php";
+		require_once "{$this->pathToService}/lib/CustomSearch.php";
 
 		//Initialize the search class
 		$cs = new Fogg\Google\CustomSearch\CustomSearch();
