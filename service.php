@@ -10,6 +10,15 @@ class Google extends Service
 	 */
 	public function _main (Request $request)
 	{
+		// do not allow a blank search
+		if(empty($request->query))
+		{
+			$response = new Response();
+			$response->setResponseSubject("Que desea buscar en Google?");
+			$response->createFromTemplate("home.tpl", array());
+			return $response;
+		}
+
 		// include lib
 		require_once $this->pathToService."/lib/CustomSearch.php";
 
@@ -23,22 +32,21 @@ class Google extends Service
 		if (isset($gresults->items))
 		foreach ($gresults->items as $gresult){
 			$results[] =  array(
-				"title" => $gresult->htmlTitle,
+				"title" => $this->utils->removeTildes($gresult->htmlTitle),
 				"url" => $gresult->link,
-				"note" => $gresult->htmlSnippet
+				"note" => $this->utils->removeTildes($gresult->htmlSnippet)
 			);
 		}
 
+		// load empty template if no results
+		if (empty($results)) $template = "empty.tpl";
+		else $template = "basic.tpl";
+
+		// create response object
 		$responseContent = array(
 			"query" => $request->query,
 			"responses" => $results
 		);
-
-		if (empty($results)) {
-			$template = "empty.tpl";
-		} else {
-			$template = "basic.tpl";
-		}
 
 		// create the response
 		$response = new Response();
