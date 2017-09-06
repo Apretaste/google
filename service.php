@@ -14,6 +14,7 @@ class Google extends Service
 		if(empty($request->query))
 		{
 			$response = new Response();
+			$response->setCache();
 			$response->setResponseSubject("Que desea buscar en Google?");
 			$response->createFromTemplate("home.tpl", array());
 			return $response;
@@ -50,6 +51,7 @@ class Google extends Service
 
 		// create the response
 		$response = new Response();
+		$response->setCache("day");
 		$response->setResponseSubject("Google: " . $request->query);
 		$response->createFromTemplate($template, $responseContent);
 		return $response;
