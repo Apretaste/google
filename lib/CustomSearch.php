@@ -9,7 +9,7 @@ class CustomSearch {
 	 *
 	 * @var string $searchEngineId
 	 */
-	private $searchEngineId = '000936576974266787775:ghj_4eipum8';
+	private $searchEngineId = '';
 	/**
 	 * Your Google API key which is found in your Developers Console:
 	 * https://console.developers.google.com/project . Click on the project then
@@ -18,7 +18,7 @@ class CustomSearch {
 	 *
 	 * @var string $googleApiKey
 	 */
-	private $googleApiKey = 'AIzaSyCH8L5ZT5aNZEhYcDFNAaSTonocjVTaY7k';
+	private $googleApiKey = '';
 	/**
 	 * The optional IP Address associated with this server and connected to the
 	 * above Google Api Key.
@@ -42,13 +42,13 @@ class CustomSearch {
 	 * @param string $userIp The IP address of your server
 	 */
 	public function __construct($searchEngineId = null, $googleApiKey = null, $userIp = null){
-		if($searchEngineId!==null){
-			$this->searchEngineId = $searchEngineId;
-		}
+		// get the Google parms
+		$di = \Phalcon\DI\FactoryDefault::getDefault();
+		$ApiKey = $di->get('config')['google']['apikey'];
+		$SearchId = $di->get('config')['google']['searchid'];
 
-		if($googleApiKey!==null){
-			$this->googleApiKey = $googleApiKey;
-		}
+		$this->searchEngineId = $SearchId;
+		$this->googleApiKey = $ApiKey;
 
 		if(!is_null($userIp)){
 			$this->userIp = $userIp;
