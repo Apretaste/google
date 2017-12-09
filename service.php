@@ -26,8 +26,16 @@ class Google extends Service
 		//Initialize the search class
 		$cs = new Fogg\Google\CustomSearch\CustomSearch();
 
+		$gresults = null;
 		//Perform a simple search
-		$gresults = $cs->simpleSearch($request->query);
+		try
+		{
+			$gresults = $cs->simpleSearch($request->query);
+		}
+		catch(Exception $e)
+		{
+
+		}
 
 		$results = array();
 		if (isset($gresults->items))
