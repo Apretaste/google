@@ -20,23 +20,17 @@ class Google extends Service
 			return $response;
 		}
 
-		// include lib
+		// include lib and create object
 		require_once "{$this->pathToService}/lib/CustomSearch.php";
-
-		//Initialize the search class
 		$cs = new Fogg\Google\CustomSearch\CustomSearch();
 
+		// perform a simple search
 		$gresults = null;
-		//Perform a simple search
-		try
-		{
+		try {
 			$gresults = $cs->simpleSearch($request->query);
-		}
-		catch(Exception $e)
-		{
+		} catch(Exception $e){}
 
-		}
-
+		// clean if exist results
 		$results = array();
 		if (isset($gresults->items))
 		foreach ($gresults->items as $gresult){
@@ -48,7 +42,7 @@ class Google extends Service
 		}
 
 		// load empty template if no results
-		if (empty($results)) $template = "empty.tpl";
+		if (empty($results)) $template = "noresults.tpl";
 		else $template = "basic.tpl";
 
 		// create response object
