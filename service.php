@@ -104,14 +104,22 @@ class Google extends Service
 			case Google::ENGINE_DUCKDUCKGO:
 				$content = $this->getRemoteContent("https://api.duckduckgo.com/?q=" . urlencode($q) . "&format=json");
 				$content = json_decode($content);
+
 				if (isset($content->results))
 					foreach ($content->results as $v) {
 						if (is_object($v)) $v = get_object_vars($v);
-						$v['title'] = '';
-						$v['url'] = '';
-						$v['note'] = '';
+						$v['title'] = $v['Text'];
+						$v['url'] = $v['FirstURL'];
+						$v['note'] = $v['Result'];
 						$results[] = $v;
 					}
+
+                if (issert($content->AbstractText))
+                    $results[] = [
+                        'title' => $content->Heading,
+                        'url' => $content->AbstractUrl,
+                        'note' => $content->AbstractText
+                    ];
 				break;
 
 			case Google::ENGINE_YANDEX:
@@ -135,10 +143,7 @@ class Google extends Service
 				if (isset($result->results)) if (is_array($result->results)) {
 					foreach ($result->results as $k => $v) {
 						if (is_object($v)) $v = get_object_vars($v);
-						$v['date'] = date("d/m/Y", $v->date);
-						$v['title'] = '';
-						$v['url'] = '';
-						$v['note'] = '';
+						$v['note'] = $v['kwic'];
 						$result->results[$k] = $v;
 					}
 					$results = $result->results;
