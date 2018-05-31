@@ -21,7 +21,7 @@ class Google extends Service
 	 * @return Response
 	 */
 	public function _main(Request $request)
-	{
+	{	
 		// do not allow a blank search
 		if (empty($request->query)) {
 			$response = new Response();
@@ -33,7 +33,6 @@ class Google extends Service
 
 		// search
 		$results = $this->search($request->query);
-
 		// load empty template if no results
 		if (empty($results)) $template = "noresults.tpl";
 		else $template = "basic.tpl";
@@ -63,17 +62,18 @@ class Google extends Service
 	 */
 	private function search($q, $engine = Google::ENGINE_GOOGLE)
 	{
+
 		$results = [];
 		$di = \Phalcon\DI\FactoryDefault::getDefault();
 		$wwwroot = $di->get('path')['root'];
 		$cacheFile = "$wwwroot/temp/google/" . md5($q);
 
 		// check the cache
-		if (file_exists($cacheFile) && time() - filemtime($cacheFile) > 100000) {
+		/*if (file_exists($cacheFile) && time() - filemtime($cacheFile) > 100000) {
 			$content = file_get_contents($cacheFile);
 			$results = json_decode($content);
 			return $results;
-		}
+		}*/
 
 		switch ($engine) {
 			case Google::ENGINE_GOOGLE:
@@ -87,6 +87,8 @@ class Google extends Service
 				try {
 					$gresults = $cs->simpleSearch($q);
 				} catch (Exception $e) {
+					$error=$e->getMessage();
+					$results["error"]=$error;
 				}
 
 				// clean if exist results
@@ -151,7 +153,7 @@ class Google extends Service
 				break;
 		}
 
-		file_put_contents($cacheFile, json_encode($results));
+		//file_put_contents($cacheFile, json_encode($results));
 
 		return $results;
 	}

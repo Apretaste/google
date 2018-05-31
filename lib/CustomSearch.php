@@ -162,6 +162,8 @@ class CustomSearch {
 	 */
 	private function getResult($querystring){
 		$requestUrl = $this->getBaseUrl() . $querystring;
+
+		
 		if(($ch = curl_init($requestUrl)) === false){
 			throw new \RuntimeException('Unable to initialize request url.');
 		}
@@ -175,9 +177,16 @@ class CustomSearch {
 
 		$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
-
 		if($responseCode!=200){
-			throw new \RuntimeException('API did not return a valid result: '.$responseCode.' Response: '.$response);
+
+			switch ($responseCode) {
+				case 403:
+					$mensaje="La cuota máxima del uso diario del servicio se ha superado. Google nos cobra por cada búsqueda, por tal motivo se han estipulado solo 1000 búsquedas por día. El día de mañana puede hacer uso del servicio nuevamente.";
+					break;
+				default: $mensaje="Error en la busqueda";
+			}
+			throw new \RuntimeException($mensaje);
+			/*throw new \RuntimeException('API did not return a valid result: '.$responseCode.' Response: '.$response);*/
 		}
 
 		return json_decode($response);
