@@ -13,6 +13,7 @@ class Google extends Service
 	const ENGINE_DUCKDUCKGO = 2;
 	const ENGINE_YANDEX = 3;
 	const ENGINE_FAROO = 4;
+	const ENGINE_BING = 5;
 
 	/**
 	 * Perform a Google search
@@ -60,7 +61,7 @@ class Google extends Service
 	 *
 	 * @return array
 	 */
-	private function search($q, $engine = Google::ENGINE_GOOGLE)
+	private function search($q, $engine = Google::ENGINE_BING/*Google::ENGINE_GOOGLE*/)
 	{
 
 		$results = [];
@@ -84,12 +85,15 @@ class Google extends Service
 
 				// perform a simple search
 				$gresults = null;
-				try {
-					$gresults = $cs->simpleSearch($q);
-				} catch (Exception $e) {
-					$error=$e->getMessage();
-					$results["error"]=$error;
-				}
+				
+
+					try {
+						$gresults = $cs->simpleSearch($q);
+					} catch (Exception $e) {
+						$error=$e->getMessage();
+						$results["error"]=$error;
+					}
+				
 
 				// clean if exist results
 				if (isset($gresults->items))
@@ -125,6 +129,23 @@ class Google extends Service
 				break;
 
 			case Google::ENGINE_YANDEX:
+				break;
+
+			case Google::ENGINE_BING:
+			$di = \Phalcon\DI\FactoryDefault::getDefault();
+			$key1 = $di->get('config')['bing']['key1'];
+			$key2 = $di->get('config')['bing']['key2'];
+			$content = $this->BingWebSearch("https://api.cognitive.microsoft.com/bing/v7.0/search",$key1,$q);
+
+				$json=json_decode($content[1]);
+				if(isset($json->webPages)){
+					foreach($json->webPages->value as $v){
+							$v = get_object_vars($v);
+							$results[]=["title"=>$v['name'],'url'=>$v['url'],'note'=>$v['snippet']];
+						}
+					}
+
+
 				break;
 
 			case Google::ENGINE_FAROO:
@@ -201,5 +222,34 @@ class Google extends Service
 		curl_close($ch);
 
 		return $html;
+	}
+	private function BingWebSearch ($url, $key, $query) {
+    // Prepare HTTP request
+    // NOTE: Use the key 'http' even if you are making an HTTPS request. See:
+    // http://php.net/manual/en/function.stream-context-create.php
+    $headers = "Ocp-Apim-Subscription-Key: $key\r\n";
+    $options = array ('http' => array (
+                          'header' => $headers,
+                           'method' => 'GET'));
+
+    // Perform the Web request and get the JSON response
+    $context = stream_context_create($options);
+    $result = file_get_contents($url . "?q=" . urlencode($query), false, $context);
+
+    // Extract Bing HTTP headers
+    $headers = array();
+    foreach ($http_response_header as $k => $v) {
+        $h = explode(":", $v, 2);
+        if (isset($h[1]))
+            if (preg_match("/^BingAPIs-/", $h[0]) || preg_match("/^X-MSEdge-/", $h[0]))
+                $headers[trim($h[0])] = trim($h[1]);
+    }
+
+    return array($headers, $result);
+}
+	//Funcion para limitar las busquedas por usuario
+	function userLimit($user){
+			/*Retornar un booleano si el usuario ha superado su limite
+			diario de busquedas.*/
 	}
 }
